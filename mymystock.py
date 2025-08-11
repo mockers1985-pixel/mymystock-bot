@@ -12,7 +12,7 @@ import threading # 두 가지 작업을 동시에 실행하기 위한 '스레딩
 
 # --- 여기는 회원님의 정보로 수정하세요 ---
 TELEGRAM_TOKEN = '8324065501:AAGH3Fw4rfb02Hdqlj5wRn0obfIsnctDrYY'
-GROUP_CHAT_ID = '4896259196' 
+GROUP_CHAT_ID = '55386148' 
 # -----------------------------------
 
 # 로깅 설정
