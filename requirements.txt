@@ -3,3 +3,4 @@ pandas
 openpyxl
 finance-datareader
 pytz
+Flask
