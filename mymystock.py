@@ -81,7 +81,7 @@ def main():
     application.add_handler(CommandHandler("ping", ping))
     
     job_queue = application.job_queue
-    job_queue.run_repeating(post_prices_to_group, interval=3600, first=10)
+    job_queue.run_repeating(post_prices_to_group, interval=840, first=10)
     
     logger.info("그룹 채팅방 알림 봇이 시작되었습니다.")
     
@@ -89,3 +89,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
