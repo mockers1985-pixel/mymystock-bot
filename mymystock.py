@@ -20,7 +20,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# 그룹 채팅방에 주가 정보를 보내는 최종 강화 함수
+# 그룹 채팅방에 주가 정보를 보내는 함수
 async def post_prices_to_group(context):
     logger.info(f"그룹 채팅방({GROUP_CHAT_ID})에 알림 발송을 시작합니다.")
     try:
@@ -30,24 +30,20 @@ async def post_prices_to_group(context):
         df_list = pd.read_excel("stock_list.xlsx", dtype={'종목명 또는 티커': str})
         search_terms = df_list['종목명 또는 티커'].dropna().tolist()
         
-        message_content = "🔔 1시간 주가 브리핑 (그룹)\n\n"
+        message_content = "🔔 주가 브리핑 (그룹)\n\n"
         start_date = dt.datetime.now() - dt.timedelta(days=10)
         
         for term in search_terms:
             code, name_to_display, market = None, term, None
             try:
-                # 1. 한국 주식 '이름'으로 검색
                 matched_krx = krx_list[krx_list['Name'] == term]
                 if not matched_krx.empty:
                     code, market = matched_krx['Code'].iloc[0], '국내'
                 else:
-                    # 2. 없으면 미국 주식 '티커'로 검색
                     if term.upper() in us_list.index:
-                        code = term.upper()
-                        market = '미국'
+                        code, market = term.upper(), '미국'
                         name_to_display = us_list.loc[code, 'Name']
                     else:
-                        # 3. 그래도 없으면 미국 주식 '이름'에 단어가 포함되는지 검색 (AT&T 해결!)
                         matched_us_name = us_list[us_list['Name'].str.contains(term, case=False, na=False)]
                         if not matched_us_name.empty:
                             code = matched_us_name.index[0]
@@ -64,12 +60,10 @@ async def post_prices_to_group(context):
                     message_content += f"📉 {name_to_display}: 등락 비교 데이터 부족\n"
                     continue
 
-                # ★★★★★ 등락폭 계산 로직 추가 ★★★★★
                 latest_price = df_price['Close'].iloc[-1]
                 previous_price = df_price['Close'].iloc[-2]
                 change = latest_price - previous_price
 
-                # 등락 표시 (▲, ▼, -)
                 change_icon = '▲' if change > 0 else '▼' if change < 0 else '-'
                 
                 currency = '원' if market == '국내' else '$'
@@ -95,19 +89,33 @@ async def post_prices_to_group(context):
         await context.bot.send_message(chat_id=GROUP_CHAT_ID, text=f"🚨 주가 정보 생성 중 오류가 발생했습니다.")
 
 
-# 나머지 코드는 이전과 동일
+# ★★★★★ /now 명령어 함수 추가 ★★★★★
+async def now(update, context):
+    """/now 명령어 수신 시, 즉시 주가 정보를 조회하여 그룹 채팅방에 보냅니다."""
+    # 그룹 채팅방에서만 동작하도록 제한 (선택 사항)
+    if str(update.message.chat_id) != GROUP_CHAT_ID:
+        await update.message.reply_text("이 명령어는 지정된 그룹 채팅방에서만 사용할 수 있습니다.")
+        return
+        
+    await update.message.reply_text("알겠습니다! 지금 바로 주가 정보를 조회하여 그룹 채팅방에 올립니다...")
+    # 예약된 작업과 동일한 함수를 즉시 실행
+    await post_prices_to_group(context)
+
+
 def main():
     application = Application.builder().token(TELEGRAM_TOKEN).build()
     
     async def ping(update, context):
-        await update.message.reply_text("저는 살아있습니다! 🤖 (등락폭+검색 개선)")
+        await update.message.reply_text("저는 살아있습니다! 🤖 (v-final, /now 탑재)")
     
+    # 명령어 핸들러 등록
     application.add_handler(CommandHandler("ping", ping))
+    application.add_handler(CommandHandler("now", now)) # /now 명령어 핸들러 등록
     
     job_queue = application.job_queue
     job_queue.run_repeating(post_prices_to_group, interval=840, first=10) # 14분 간격
     
-    logger.info("그룹 채팅방 알림 봇이 시작되었습니다. (v-final)")
+    logger.info("그룹 채팅방 알림 봇이 시작되었습니다. (v-final, /now 탑재)")
     application.run_polling()
 
 if __name__ == '__main__':
