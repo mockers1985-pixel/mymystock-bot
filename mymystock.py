@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 @app.route('/')
 def hello_world():
-    return "텔레그램 봇이 작동 중입니다!"
+    return "ok"
 def run_flask():
     app.run(host='0.0.0.0', port=10000)
 
@@ -132,3 +132,4 @@ if __name__ == '__main__':
     flask_thread = threading.Thread(target=run_flask)
     flask_thread.start()
     main_bot()
+
