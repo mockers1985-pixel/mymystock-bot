@@ -1,6 +1,6 @@
-python-telegram-bot[job-queue]
+Flask
 pandas
 openpyxl
 finance-datareader
-pytz
-Flask
+gspread
+oauth2client
