@@ -30,7 +30,7 @@ def get_stock_data_from_gsheet():
         client = gspread.authorize(creds)
         
         # 2. 구글 시트 파일 열기 (★★★★★ 파일 이름을 본인의 것으로 바꿔주세요 ★★★★★)
-        sheet = client.open(my stock list).sheet1
+        sheet = client.open("my stock list").sheet1
         
         # 3. 시트에서 데이터 읽어오기
         records = sheet.get_all_records()
@@ -116,4 +116,5 @@ def get_stock_data_api():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000, debug=True)
+
 
