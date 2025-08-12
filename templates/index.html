@@ -3,50 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나만의 주식 정보 웹페이지</title>
+    <title>실시간 주식 정보 대시보드</title>
     <style>
-        body { font-family: sans-serif; margin: 2em; background-color: #f4f4f9; color: #333; }
-        #container { max-width: 800px; margin: auto; background: white; padding: 2em; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { color: #5a67d8; }
-        button { background-color: #5a67d8; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; }
-        button:hover { background-color: #434190; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-        #result { margin-top: 2em; padding: 1em; background-color: #eef2f7; border-radius: 5px; white-space: pre-wrap; font-family: monospace; font-size: 14px; min-height: 100px; }
+        /* 기본 스타일 초기화 및 폰트 설정 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+        }
+
+        /* 상단 헤더 스타일 */
+        header {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #0d6efd; /* 파란색 계열 */
+        }
+
+        /* 메인 컨텐츠 영역 스타일 */
+        #container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 버튼 스타일 */
+        button {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            display: block;
+            margin: 20px 0;
+        }
+
+        button:hover {
+            background-color: #0a58ca;
+            transform: translateY(-2px); /* 살짝 떠오르는 효과 */
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 결과 표시 영역 스타일 */
+        #result {
+            margin-top: 2em;
+            padding: 1.5em;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            min-height: 150px;
+            line-height: 1.6;
+        }
+
+        /* 하단 푸터 스타일 */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
+
+    <header>
+        <h1>📈 주식 대시보드</h1>
+        <p>My Stock Dashboard</p>
+    </header>
+
     <div id="container">
-        <h1>📈 나만의 주식 정보 웹페이지</h1>
-        <p>아래 버튼을 누르면 엑셀 파일에 등록된 주식의 최신 정보를 가져옵니다.</p>
-        <button id="fetch-button">데이터 가져오기</button>
+        <h2>실시간 정보 조회</h2>
+        <p>아래 버튼을 누르면 구글 시트에 등록된 주식의 최신 정보를 가져옵니다.</p>
+        <button id="fetch-button">새로고침</button>
         <div id="result">결과가 여기에 표시됩니다...</div>
     </div>
 
+    <footer>
+        <p>&copy; 2025 My Stock Page. All Rights Reserved.</p>
+    </footer>
+
     <script>
-        // JavaScript 코드: 버튼 클릭 이벤트를 처리합니다.
+        // JavaScript 코드는 이전과 동일합니다.
         document.getElementById('fetch-button').addEventListener('click', function() {
             const resultDiv = document.getElementById('result');
             const fetchButton = document.getElementById('fetch-button');
-
-            // 버튼을 비활성화하고 로딩 메시지를 표시합니다.
             fetchButton.disabled = true;
-            resultDiv.innerText = "데이터를 가져오는 중입니다... 잠시만 기다려주세요.";
+            resultDiv.innerText = "데이터를 가져오는 중입니다... 🌪️";
 
-            // 우리 파이썬 서버의 /get-stock-data 주소로 데이터를 요청합니다.
             fetch('/get-stock-data')
-                .then(response => response.json()) // 받은 응답을 JSON 형태로 변환합니다.
+                .then(response => response.json())
                 .then(data => {
-                    // 성공적으로 데이터를 받으면, 결과 영역에 표시합니다.
                     resultDiv.innerText = data.message;
-                    fetchButton.disabled = false; // 버튼을 다시 활성화합니다.
+                    fetchButton.disabled = false;
                 })
                 .catch(error => {
-                    // 오류가 발생하면, 오류 메시지를 표시합니다.
                     console.error('Error:', error);
-                    resultDiv.innerText = "오류가 발생했습니다. 서버 로그를 확인해주세요.";
-                    fetchButton.disabled = false; // 버튼을 다시 활성화합니다.
+                    resultDiv.innerText = "오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+                    fetchButton.disabled = false;
                 });
         });
+
+        // 페이지가 처음 로드될 때 자동으로 데이터를 한 번 가져오기 (선택 사항)
+        window.onload = function() {
+            document.getElementById('fetch-button').click();
+        };
     </script>
 </body>
 </html>
